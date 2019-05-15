@@ -1418,10 +1418,14 @@ func flattenApplicationGatewayAuthenticationCertificates(input *[]network.Applic
 		// since the certificate data isn't returned we have to load it from the same index
 		if existing, ok := d.GetOk("authentication_certificate"); ok && existing != nil {
 			existingVals := existing.([]interface{})
-			if len(existingVals) >= i {
-				existingCerts := existingVals[i].(map[string]interface{})
-				if data := existingCerts["data"]; data != nil {
-					output["data"] = data.(string)
+			for _, existingVal := range existingVals {
+				existingCerts := existingVal.(map[string]interface{})
+				existingName := existingCerts["name"].(string)
+
+				if v.Name != nil && *v.Name == existingName {
+					if data := existingCerts["data"]; data != nil {
+						output["data"] = data.(string)
+					}
 				}
 			}
 		}
